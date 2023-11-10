@@ -27,15 +27,15 @@ def main(input_dir, output_dir, log_level):
     # setup_visualization(VisualizationConfig())
 
     LAB_ATTR_NAMES = [
-        'reply.dataset.dataset_uname',
-        'reply.dataset.seed',
-        'reply.dataset.n_shot',
-        'reply.dataset.icl_max_proof_by_contradiction_per_label',
+        'dataset_uname',
+        'seed',
+        'n_shot',
+        'icl_max_proof_by_contradiction_per_label',
 
-        'reply.model_name',
-        # 'reply.dataset.prompt_type',
+        'model_name',
+        # 'prompt_type',
 
-        'reply.max_samples',
+        'max_samples',
     ]
 
     METRIC_NAMES = [
@@ -43,7 +43,7 @@ def main(input_dir, output_dir, log_level):
         'answer_accuracy',
     ]
 
-    def lab_short_name(name):
+    def normalize_lab_name(name):
         return re.sub(r'^dataset\.', '', re.sub(r'^reply\.', '', name))
 
     df_dict = defaultdict(list)
@@ -51,13 +51,14 @@ def main(input_dir, output_dir, log_level):
         for metrich_summary_path in _input_dir.glob('**/*/metrics_summary.json'):
             metrics = json.load(open(str(metrich_summary_path)))
             lab_setting = json.load(open(str(metrich_summary_path.parent / 'lab.params.json')))
+            lab_setting = {normalize_lab_name(k): v for k, v in lab_setting.items()}
 
             if len(metrics) == 0:
                 logger.warning('no metrics found in %s', str(metrich_summary_path))
                 continue
 
             for name in LAB_ATTR_NAMES:
-                df_dict[lab_short_name(name)].append(lab_setting.get(name, None))
+                df_dict[name].append(lab_setting.get(name, None))
 
             for type_name, type_metrics in metrics.items():
                 for name in METRIC_NAMES:
@@ -73,7 +74,7 @@ def main(input_dir, output_dir, log_level):
     merged_df = pd.DataFrame(df_dict)
     merged_df = merged_df.sort_values(by=merged_df.columns.tolist())
     agg_df = aggregate(merged_df,
-                       [lab_short_name(col) for col in LAB_ATTR_NAMES + METRIC_NAMES
+                       [col for col in LAB_ATTR_NAMES + METRIC_NAMES
                         if not is_metric_col(col) and not is_variation_col(col)],
                         aggregate_funcs={col: lambda vals: statistics.mean(vals)
                                          for col in merged_df.columns

@@ -22,12 +22,15 @@ logger = logging.getLogger(__name__)
 
 
 # @profile
-def _load_dataset(dataset_name: Optional[str] = None,
+def load_examples(dataset_name: Optional[str] = None,
                   dataset_config_name: Optional[str] = None,
                   train_file: Optional[str] = None,
-                  test_file: Optional[str] = None):
+                  test_file: Optional[str] = None)\
+        -> Dict[str, Dict[str, List[Deduction]]]:
+    """ return dict of {split: {label: [example1, example2, ...]}}]}} """
+
     if dataset_name is not None:
-        raw_datasets = load_dataset(dataset_name, dataset_config_name)
+        datasets = load_dataset(dataset_name, dataset_config_name)
     else:
         data_files = {}
         if train_file is not None:
@@ -35,27 +38,10 @@ def _load_dataset(dataset_name: Optional[str] = None,
         if test_file is not None:
             data_files["test"] = test_file
 
-        raw_datasets = load_dataset('json', data_files=data_files)
+        datasets = load_dataset('json', data_files=data_files)
 
-    return raw_datasets
-
-
-# @profile
-def load_examples(dataset_name: Optional[str] = None,
-                  dataset_config_name: Optional[str] = None,
-                  train_file: Optional[str] = None,
-                  test_file: Optional[str] = None)\
-        -> Dict[str, Dict[Union[str, bool], List[Deduction]]]:
-
-    dataset = _load_dataset(
-        dataset_name=dataset_name,
-        dataset_config_name=dataset_config_name,
-        train_file=train_file,
-        test_file=test_file,
-    )
-
-    examples = defaultdict(lambda: defaultdict(list))
-    for split, dataset in dataset.items():
+    examples: Dict[str, Dict[str, List[Deduction]]] = defaultdict(lambda: defaultdict(list))
+    for split, dataset in datasets.items():
         for dataset_example in dataset:
             example = load_deduction(dataset_example)
             label = example.world_assump_label
@@ -115,7 +101,6 @@ def _make_intro(prompt_type: str) -> Optional[str]:
         return _INTROS['v1']
     elif prompt_type == 'ICL-COT.v2':
         return _INTROS['v2']
-
     else:
         return None
 

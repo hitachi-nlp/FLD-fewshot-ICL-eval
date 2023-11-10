@@ -2,41 +2,39 @@
 import logging
 from pathlib import Path
 
-
-import click
 from script_engine import QsubEngine, SubprocessEngine
 from logger_setup import setup as setup_logger
 from lab import build_dir
 
-from experimental_setting import (
+from FLD_user_shared_settings import (
     get_dataset_setting,
     run_by_engine,
     maybe_option_value,
 )
+from settings import DIENAME_IGNORE_PARAMS
 
 logger = logging.getLogger(__name__)
 
 
-@click.command()
 def main():
     setup_logger(level=logging.INFO, clear_other_handlers=True)
 
-    # output_top_dir = Path('./outputs/00.make_prompts.py/20230711.refactor_distractors')
-    # output_top_dir = Path('./outputs/00.make_prompts.py/2023-08-31.jpn')
-    # output_top_dir = Path('./outputs/00.make_prompts.py/20230905.LLM_FS')
-    # output_top_dir = Path('./outputs/00.make_prompts.py/20230919.jpn')
-    # output_top_dir = Path('./outputs/00.make_prompts.py/20231106.refaactor')
+    # output_top_dir = Path('./outputs/00.make_dataset.py/20230711.refactor_distractors')
+    # output_top_dir = Path('./outputs/00.make_dataset.py/2023-08-31.jpn')
+    # output_top_dir = Path('./outputs/00.make_dataset.py/20230905.LLM_FS')
+    # output_top_dir = Path('./outputs/00.make_dataset.py/20230919.jpn')
+    # output_top_dir = Path('./outputs/00.make_dataset.py/20231106.refaactor')
 
-    # output_top_dir = Path('./outputs/00.make_prompts.py/20231107.preliminary')
-    # output_top_dir = Path('./outputs/00.make_prompts.py/20231107.preliminary.seed--1')
-    # output_top_dir = Path('./outputs/00.make_prompts.py/20231107.preliminary.seed--2')
+    # output_top_dir = Path('./outputs/00.make_dataset.py/20231107.preliminary')
+    # output_top_dir = Path('./outputs/00.make_dataset.py/20231107.preliminary.seed--1')
+    # output_top_dir = Path('./outputs/00.make_dataset.py/20231107.preliminary.seed--2')
 
-    # output_top_dir = Path('./outputs/00.make_prompts.py/20231107.preliminary.many_seeds')
+    # output_top_dir = Path('./outputs/00.make_dataset.py/20231107.preliminary.many_seeds')
 
-    # output_top_dir = Path('./outputs/00.make_prompts.py/20231109.icl_max_proof_by_contradiction_per_label')
-    # output_top_dir = Path('./outputs/00.make_prompts.py/20231109.3-shot')
+    # output_top_dir = Path('./outputs/00.make_dataset.py/20231109.icl_max_proof_by_contradiction_per_label')
+    # output_top_dir = Path('./outputs/00.make_dataset.py/20231109.3-shot')
 
-    output_top_dir = Path('./outputs/00.make_prompts.py/20231110.refactor')
+    output_top_dir = Path('./outputs/00.make_dataset.py/20231110.refactor')
 
     DATASETS_DIRS = [
         # './outputs/00.fix_FLD_schema.py/20230711.refactor_distractors',
@@ -50,10 +48,10 @@ def main():
 
     dataset_unames = [
         # ---------------------------------- 20230729.case_study_finalize ------------------------------------
-        # '20230729.case_study_finalize.D3',
+        '20230729.case_study_finalize.D3',
         # '20230729.case_study_finalize.D8',
 
-        'hf.hitachi-nlp/FLD.v2__default',
+        # 'hf.hitachi-nlp/FLD.v2__default',
         # 'hf.hitachi-nlp/FLD.v2__star',
 
         # ---------------------------------- 20230826.jpn ------------------------------------
@@ -81,8 +79,8 @@ def main():
 
     seeds = [
         0,
-        1,
-        2,
+        # 1,
+        # 2,
         # 3,
         # 4,
     ]
@@ -101,16 +99,14 @@ def main():
         'ICL-COT.v2',
     ]
 
-    wait_until_finish = False
+    wait_until_finish = True
 
     engine = SubprocessEngine()   # for debug
     # engine = QsubEngine('ABCI', 'rt_G.large')
 
     dry_run = False
 
-    # -------------------------- fixed settings --------------------------
-
-    # -------------------------- running --------------------------
+    # ------------------------------------ run ------------------------------------
     for dataset_uname in dataset_unames:
         for prompt_type in prompt_types:
             for n_shot in n_shot_list:
@@ -140,24 +136,12 @@ def main():
                                 f'n_sht={setting["n_shot"]}'
                             ),
                             short=True,
-                            dirname_ignore_params=[
-                                'dataset_uname',
-                                'dataset_config_name',
-                                'instruction',
-                                'predict_with_generate',
-                                'remove_unused_columns',
-                                'streaming',
-                                'train_file',
-                                'validation_file',
-                                'test_file',
-                                'prompt_type',
-                                'n_shot',
-                            ],
+                            dirname_ignore_params=DIENAME_IGNORE_PARAMS,
                             save_params=True
                         )
 
                         command = ' '.join([
-                            'python ./make_prompts.py',
+                            'python ./scripts/make_dataset.py',
                             f'--output-dir {str(output_dir)}',
                             maybe_option_value('--dataset-name', setting.get('dataset_name', None)),
                             maybe_option_value('--dataset-config-name', setting.get('dataset_config_name', None)),
@@ -178,7 +162,7 @@ def main():
                             dry_run=dry_run
                         )
 
-    logger.info('------------- 00.make_prompts.py finished !! -----------')
+    logger.info('------------- 00.make_dataset.py finished !! -----------')
 
 
 if __name__ == '__main__':
