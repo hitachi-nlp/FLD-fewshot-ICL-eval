@@ -34,7 +34,10 @@ def main():
     # output_top_dir = Path('./outputs/00.make_dataset.py/20231109.icl_max_proof_by_contradiction_per_label')
     # output_top_dir = Path('./outputs/00.make_dataset.py/20231109.3-shot')
 
-    output_top_dir = Path('./outputs/00.make_dataset.py/20231110.refactor')
+    # output_top_dir = Path('./outputs/00.make_dataset.py/20231110.refactor')
+    # output_top_dir = Path('./outputs/00.make_dataset.py/20231110.refactor')
+
+    output_top_dir = Path('./outputs/00.make_dataset.py/20231110.FLD_task_old')
 
     DATASETS_DIRS = [
         # './outputs/00.fix_FLD_schema.py/20230711.refactor_distractors',
@@ -48,10 +51,10 @@ def main():
 
     dataset_unames = [
         # ---------------------------------- 20230729.case_study_finalize ------------------------------------
-        '20230729.case_study_finalize.D3',
+        # '20230729.case_study_finalize.D3',
         # '20230729.case_study_finalize.D8',
 
-        # 'hf.hitachi-nlp/FLD.v2__default',
+        'hf.hitachi-nlp/FLD.v2__default',
         # 'hf.hitachi-nlp/FLD.v2__star',
 
         # ---------------------------------- 20230826.jpn ------------------------------------
@@ -92,13 +95,6 @@ def main():
         None,
     ]
 
-    prompt_types = [
-        # 'ICL',
-        # 'ICL-COT',
-        # 'ICL-COT.v1',
-        'ICL-COT.v2',
-    ]
-
     wait_until_finish = True
 
     engine = SubprocessEngine()   # for debug
@@ -107,60 +103,62 @@ def main():
     dry_run = False
 
     # ------------------------------------ run ------------------------------------
+    prompt_version = 'v2'
     for dataset_uname in dataset_unames:
-        for prompt_type in prompt_types:
-            for n_shot in n_shot_list:
-                for seed in seeds:
-                    for icl_max_proof_by_contradiction_per_label in icl_max_proof_by_contradiction_per_label_args:
-                        setting = {
-                            'dataset_uname': dataset_uname,
-                            'prompt_type': prompt_type,
-                            'n_shot': n_shot,
-                            'seed': seed,
-                            'icl_max_proof_by_contradiction_per_label': icl_max_proof_by_contradiction_per_label,
-                        }
-                        setting.update(
-                            get_dataset_setting(
-                                'run_prover',
-                                dataset_uname=dataset_uname,
-                                top_dirs=DATASETS_DIRS,
-                            )
+        for n_shot in n_shot_list:
+            for seed in seeds:
+                for icl_max_proof_by_contradiction_per_label in icl_max_proof_by_contradiction_per_label_args:
+                    setting = {
+                        'dataset_uname': dataset_uname,
+                        'prompt_version': prompt_version,
+                        'n_shot': n_shot,
+                        'seed': seed,
+                        'icl_max_proof_by_contradiction_per_label': icl_max_proof_by_contradiction_per_label,
+                        'reload_deduction': True,
+                    }
+                    setting.update(
+                        get_dataset_setting(
+                            'run_prover',
+                            dataset_uname=dataset_uname,
+                            top_dirs=DATASETS_DIRS,
                         )
+                    )
 
-                        output_dir = build_dir(
-                            setting,
-                            top_dir=str(
-                                Path(output_top_dir) /
-                                f'dtst_nm={setting["dataset_uname"]}' /
-                                f'prmpt_typ={setting["prompt_type"]}' /
-                                f'n_sht={setting["n_shot"]}'
-                            ),
-                            short=True,
-                            dirname_ignore_params=DIENAME_IGNORE_PARAMS,
-                            save_params=True
-                        )
+                    output_dir = build_dir(
+                        setting,
+                        top_dir=str(
+                            Path(output_top_dir) /
+                            f'dtst_nm={setting["dataset_uname"]}' /
+                            f'prmpt_typ={setting["prompt_version"]}' /
+                            f'n_sht={setting["n_shot"]}'
+                        ),
+                        short=True,
+                        dirname_ignore_params=DIENAME_IGNORE_PARAMS,
+                        save_params=True
+                    )
 
-                        command = ' '.join([
-                            'python ./scripts/make_dataset.py',
-                            f'--output-dir {str(output_dir)}',
-                            maybe_option_value('--dataset-name', setting.get('dataset_name', None)),
-                            maybe_option_value('--dataset-config-name', setting.get('dataset_config_name', None)),
-                            maybe_option_value('--train-file', setting.get('train_file', None)),
-                            maybe_option_value('--test-file', setting.get('test_file', None)),
-                            f'--prompt-type {setting["prompt_type"]}',
-                            f'--n-shot {setting["n_shot"]}',
-                            maybe_option_value('--icl-max-proof-by-contradiction-per-label', setting.get('icl_max_proof_by_contradiction_per_label', None)),
-                            f'--seed {setting["seed"]}',
-                        ])
+                    command = ' '.join([
+                        'python ./scripts/make_dataset.py',
+                        f'--output-dir {str(output_dir)}',
+                        maybe_option_value('--dataset-name', setting.get('dataset_name', None)),
+                        maybe_option_value('--dataset-config-name', setting.get('dataset_config_name', None)),
+                        maybe_option_value('--train-file', setting.get('train_file', None)),
+                        maybe_option_value('--test-file', setting.get('test_file', None)),
+                        f'--prompt-version {setting["prompt_version"]}',
+                        f'--n-shot {setting["n_shot"]}',
+                        maybe_option_value('--icl-max-proof-by-contradiction-per-label', setting.get('icl_max_proof_by_contradiction_per_label', None)),
+                        '--reload-deduction' if setting.get('reload_deduction', False) else '',
+                        f'--seed {setting["seed"]}',
+                    ])
 
-                        run_by_engine(
-                            engine,
-                            command,
-                            output_dir,
-                            hours=1,
-                            wait_until_finish=wait_until_finish,
-                            dry_run=dry_run
-                        )
+                    run_by_engine(
+                        engine,
+                        command,
+                        output_dir,
+                        hours=1,
+                        wait_until_finish=wait_until_finish,
+                        dry_run=dry_run
+                    )
 
     logger.info('------------- 00.make_dataset.py finished !! -----------')
 

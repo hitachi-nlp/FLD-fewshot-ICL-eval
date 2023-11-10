@@ -21,7 +21,7 @@ logger = logging.getLogger(__name__)
 @click.option('--output_dir', default=None)
 @click.option('--log-level', default='INFO')
 def main(input_dir, output_dir, log_level):
-    setup_logger(level=log_level)
+    setup_logger(level=log_level, clear_other_handlers=True)
     input_dirs = [Path(_input_dir) for _input_dir in input_dir]
     output_dir = Path(output_dir) if output_dir is not None else None
     # setup_visualization(VisualizationConfig())
@@ -35,7 +35,7 @@ def main(input_dir, output_dir, log_level):
         'model_name',
         # 'prompt_type',
 
-        'max_samples',
+        'max_examples',
     ]
 
     METRIC_NAMES = [
@@ -69,7 +69,7 @@ def main(input_dir, output_dir, log_level):
         return name.find('accuracy') >= 0
 
     def is_variation_col(name: str) -> bool:
-        return name.find('seed') >= 0 or name.find('max_samples') >= 0
+        return name.find('seed') >= 0 or name.find('max_examples') >= 0
 
     merged_df = pd.DataFrame(df_dict)
     merged_df = merged_df.sort_values(by=merged_df.columns.tolist())

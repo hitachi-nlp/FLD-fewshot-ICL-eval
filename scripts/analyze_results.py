@@ -1,14 +1,12 @@
 #!/usr/bin/env python
-import os
 import logging
 from pathlib import Path
-from typing import List, Union, Dict, Tuple
+from typing import List, Union, Dict
 import json
-from pprint import pprint
 
 from logger_setup import setup as setup_logger
 import click
-from FLD_task import prettify_proof_text, prettify_facts_text
+from FLD_task import prettify_proof_text, prettify_context_text,  load_deduction
 
 
 logger = logging.getLogger(__name__)
@@ -17,18 +15,18 @@ logger = logging.getLogger(__name__)
 @click.command()
 @click.argument('input_path')
 @click.argument('output_dir')
-# @click.option('--answer-accuracy-threshold', type=float, default=0.1)
+@click.option('--reload-deduction', is_flag=True)
 @click.option('--log-level', default='INFO')
-def main(input_path, output_dir, log_level):
-    setup_logger(level=log_level)
+def main(input_path, output_dir, reload_deduction, log_level):
+    setup_logger(level=log_level, clear_other_handlers=True)
     input_path = Path(input_path)
     output_dir = Path(output_dir)
 
-    samples = [
+    examples = [
         json.loads(line.strip('\n'))
         for line in open(input_path)
     ]
-    metrics_types = list(samples[0]['metrics'].keys())
+    metrics_types = list(examples[0]['metrics'].keys())
 
     for metric_type in metrics_types:
         for metric in ['proof_accuracy.zero_one', 'answer_accuracy']:
@@ -36,29 +34,34 @@ def main(input_path, output_dir, log_level):
             corrects_path = output_dir / f'metric_type--{metric_type}.metric--{metric}.corrects.txt'
             with open(errors_path, 'w') as f_err, open(corrects_path, 'w') as f_corr:
 
-                for i_sample, sample in enumerate(samples):
-                    if metric_type not in sample['metrics']:
+                for i_example, example in enumerate(examples):
+                    if metric_type not in example['metrics']:
                         f_err.write('\n\n\n\n\n')
-                        f_err.write(f'****************************************** example-{i_sample} ******************************************')
+                        f_err.write(f'****************************************** example-{i_example} ******************************************')
                         f_err.write('metrics not found in this example, might be failed to calculate the metrics due to some errors.')
                         continue
 
-                    accuracy = sample['metrics'][metric_type][metric]
+                    accuracy = example['metrics'][metric_type][metric]
                     if accuracy > 0.0:
                         f_out = f_corr
                     else:
                         f_out = f_err
 
-                    facts = sample['example']['facts']
-                    hypothesis = sample['example']['hypothesis']
-                    proof_gold = sample['gold_proof']
-                    proof_pred = sample['reply']
+                    if reload_deduction:
+                        deduction_example = load_deduction(example['example'])
+                        facts = deduction_example.context
+                        hypothesis = deduction_example.hypothesis
+                    else:
+                        facts = example['example'].get('facts', example['example'].get('context', None))
+                        hypothesis = example['example']['hypothesis']
+                    proof_gold = example['gold_proof']
+                    proof_pred = example['reply']
 
                     f_out.write('\n\n\n\n\n')
-                    f_out.write(f'****************************************** example-{i_sample} ******************************************')
+                    f_out.write(f'****************************************** example-{i_example} ******************************************')
 
                     f_out.write('\n\n===================== facts =====================\n')
-                    f_out.write(prettify_facts_text(facts))
+                    f_out.write(prettify_context_text(facts))
 
                     f_out.write('\n\n===================== hypothesis =====================\n')
                     f_out.write(hypothesis)

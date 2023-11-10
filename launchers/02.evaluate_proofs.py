@@ -50,8 +50,11 @@ def main():
     # input_top_dir = Path('./outputs/01.predict.py/20231109.3-shot')
     # output_top_dir = Path('./outputs/02.evaluate_proofs.py/20231109.3-shot')
 
-    input_top_dir = Path('./outputs/01.predict.py/20231110.refactor')
-    output_top_dir = Path('./outputs/02.evaluate_proofs.py/20231110.refactor')
+    # input_top_dir = Path('./outputs/01.predict.py/20231110.refactor')
+    # output_top_dir = Path('./outputs/02.evaluate_proofs.py/20231110.refactor')
+
+    input_top_dir = Path('./outputs/01.predict.py/20231110.FLD_task_old')
+    output_top_dir = Path('./outputs/02.evaluate_proofs.py/20231110.FLD_task_old')
 
     skip_if_exists = False
     dry_run = False

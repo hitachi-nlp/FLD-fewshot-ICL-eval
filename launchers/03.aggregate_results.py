@@ -55,10 +55,15 @@ def main():
     # ]
     # output_dir = Path('./outputs/03.aggregate_results.py/20231109.3-shot')
 
+    # input_dirs = [
+    #     './outputs/02.evaluate_proofs.py/20231110.refactor',
+    # ]
+    # output_dir = Path('./outputs/03.aggregate_results.py/20231110.refactor')
+
     input_dirs = [
-        './outputs/02.evaluate_proofs.py/20231110.refactor',
+        './outputs/02.evaluate_proofs.py/20231110.FLD_task_old',
     ]
-    output_dir = Path('./outputs/03.aggregate_results.py/20231110.refactor')
+    output_dir = Path('./outputs/03.aggregate_results.py/20231110.FLD_task_old')
 
     # ------------------------------------ run ------------------------------------
     command = ' '.join([

@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 import logging
 from pathlib import Path
+import json
 
 from script_engine import QsubEngine, SubprocessEngine
 from logger_setup import setup as setup_logger
@@ -54,15 +55,18 @@ def main():
     # input_top_dir = Path('./outputs/10.make_dataset.py/20231109.3-shot')
     # output_top_dir = Path('./outputs/01.predict.py/20231109.3-shot')
 
-    input_top_dir = Path('./outputs/00.make_dataset.py/20231110.refactor')
-    output_top_dir = Path('./outputs/01.predict.py/20231110.refactor')
+    # input_top_dir = Path('./outputs/00.make_dataset.py/20231110.refactor')
+    # output_top_dir = Path('./outputs/01.predict.py/20231110.refactor')
+
+    input_top_dir = Path('./outputs/00.make_dataset.py/20231110.FLD_task_old')
+    output_top_dir = Path('./outputs/01.predict.py/20231110.FLD_task_old')
 
     dataset_unames = [
         # ---------------------------------- 20230729.case_study_finalize ------------------------------------
-        '20230729.case_study_finalize.D3',
+        # '20230729.case_study_finalize.D3',
         # '20230729.case_study_finalize.D8',
 
-        # 'hf.hitachi-nlp/FLD.v2__default',
+        'hf.hitachi-nlp/FLD.v2__default',
         # 'hf.hitachi-nlp/FLD.v2__star',
 
         # ---------------------------------- 20230826.jpn ------------------------------------
@@ -153,7 +157,7 @@ def main():
                     str(prompt_path),
                     str(output_path),
                     f'--model-name {model_name}',
-                    f'--max-samples {max_samples}',
+                    f'--max-examples {max_samples}',
                 ])
 
             run_by_engine(
