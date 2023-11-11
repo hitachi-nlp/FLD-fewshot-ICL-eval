@@ -56,15 +56,18 @@ def main():
     # input_top_dir = Path('./outputs/01.predict.py/20231110.FLD_task_old')
     # output_top_dir = Path('./outputs/02.evaluate_proofs.py/20231110.FLD_task_old')
 
-    input_top_dir = Path('./outputs/01.predict.py/20231111')
-    output_top_dir = Path('./outputs/02.evaluate_proofs.py/20231111')
+    # input_top_dir = Path('./outputs/01.predict.py/20231111')
+    # output_top_dir = Path('./outputs/02.evaluate_proofs.py/20231111')
 
-    skip_if_exists = False
-    dry_run = False
+    input_top_dir = Path('./outputs/01.predict.py/20231111.production')
+    output_top_dir = Path('./outputs/02.evaluate_proofs.py/20231111.production')
 
     # ------------------------------------ run ------------------------------------
     engine = SubprocessEngine()
     # engine = QsubEngine('ABCI', 'rt_G.large')
+
+    skip_if_exists = False
+    dry_run = False
 
     for pred_path in input_top_dir.glob('**/predictions.jsonl'):
         setting = {

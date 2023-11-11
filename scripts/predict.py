@@ -60,7 +60,7 @@ def main(input_path,
 
         def predict(prompt: str) -> Optional[str]:
             last_exception = None
-            for i in range(0, 3):
+            for i in range(0, 5):
                 try:
                     return chat_model([HumanMessage(content=prompt)]).content
                 except openai.error.RateLimitError as e:

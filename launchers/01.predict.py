@@ -64,8 +64,14 @@ def main():
     # input_top_dir = Path('./outputs/00.make_dataset.py/20231110.FLD_task_old')
     # output_top_dir = Path('./outputs/01.predict.py/20231110.FLD_task_old')
 
-    input_top_dir = Path('./outputs/00.make_dataset.py/20231111')
-    output_top_dir = Path('./outputs/01.predict.py/20231111')
+    # input_top_dir = Path('./outputs/00.make_dataset.py/20231111')
+    # output_top_dir = Path('./outputs/01.predict.py/20231111')
+
+    # input_top_dir = Path('./outputs/00.make_dataset.py/20231111.production')
+    # output_top_dir = Path('./outputs/01.predict.py/20231111.production')
+
+    input_top_dir = Path('./outputs/00.make_dataset.py/20231111.production.large')
+    output_top_dir = Path('./outputs/01.predict.py/20231111.production.large')
 
     dataset_unames = [
         # ---------------------------------- 20230729.case_study_finalize ------------------------------------
@@ -73,7 +79,7 @@ def main():
         # '20230729.case_study_finalize.D8',
 
         'hf.hitachi-nlp/FLD.v2__default',
-        # 'hf.hitachi-nlp/FLD.v2__star',
+        'hf.hitachi-nlp/FLD.v2__star',
 
         # ---------------------------------- 20230826.jpn ------------------------------------
         # '20230826.jpn.D3',
@@ -86,17 +92,10 @@ def main():
         # '20230916.jpn.D5',
     ]
 
-    n_shot_list = [
-        3,
-        # 10,
-        # 16,
-        # 32,
-    ]
-
     model_names = [
         # ==== openai models (https://platform.openai.com/docs/models) for the openai models.
-        # ('openai.gpt-3.5-turbo-16k', None),
-        # ('openai.gpt-4', None),                # context=8k, $0.03 / 1K tokens	$0.06 / 1K tokens
+        ('openai.gpt-3.5-turbo-16k', None),
+        ('openai.gpt-4', None),                # context=8k, $0.03 / 1K tokens	$0.06 / 1K tokens
 
         # ==== llama related models
 
@@ -104,7 +103,7 @@ def main():
         # ('hf.Yukang/Llama-2-7b-longlora-32k-ft', 'hf.meta-llama/Llama-2-7b-hf'),
         # ('hf.Yukang/Llama-2-13b-longlora-32k-ft', 'hf.meta-llama/Llama-2-7b-hf')
         # ('hf.Yukang/LongAlpaca-7B', 'hf.meta-llama/Llama-2-7b-hf')
-        ('hf.Yukang/LongAlpaca-13B', 'hf.meta-llama/Llama-2-13b-hf')
+        # ('hf.Yukang/LongAlpaca-13B', 'hf.meta-llama/Llama-2-13b-hf')
 
         # ==== other models not used
         # ('openai.gpt-3.5-turbo', None),     # XXX context=4k
@@ -119,9 +118,28 @@ def main():
         # ('hf.Yukang/LongAlpaca-70B', 'hf.meta-llama/Llama-2-70b-hf')
     ]
 
-    max_samples = 5
+    n_shot_list = [
+        # 3,
+        10,   # for 8k context
+        # 32, # for 16k context
+    ]
+
+    seeds = [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+    ]
+
+    # max_samples = 5
     # max_samples = 31
-    # max_samples = 61
+    max_samples = 50
     # max_samples = 101
     # max_samples = 201
     # max_samples = None
@@ -135,10 +153,13 @@ def main():
     # tensor_parallel_size = 4
     tensor_parallel_size = 1
 
+    # wait_until_finish = True
+    wait_until_finish = False
     skip_if_exists = False
-    dry_run = False
 
     # ------------------------------------ run ------------------------------------
+    dry_run = False
+
     if isinstance(engine, QsubEngine):
         match engine.resource:
             case 'rt_G.small':
@@ -168,6 +189,8 @@ def main():
             if dataset_setting['dataset_uname'] not in dataset_unames:
                 continue
             if dataset_setting['n_shot'] not in n_shot_list:
+                continue
+            if dataset_setting['seed'] not in seeds:
                 continue
 
             setting.update({
@@ -205,6 +228,7 @@ def main():
                 command,
                 output_dir,
                 hours=1,
+                wait_until_finish=wait_until_finish,
                 dry_run=dry_run
             )
 

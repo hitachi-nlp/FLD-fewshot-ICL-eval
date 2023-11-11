@@ -39,7 +39,8 @@ def main():
 
     # output_top_dir = Path('./outputs/00.make_dataset.py/20231110.FLD_task_old')
 
-    output_top_dir = Path('./outputs/00.make_dataset.py/20231111')
+    # output_top_dir = Path('./outputs/00.make_dataset.py/20231111.production')
+    output_top_dir = Path('./outputs/00.make_dataset.py/20231111.production.large')
 
     DATASETS_DIRS = [
         # './outputs/00.fix_FLD_schema.py/20230711.refactor_distractors',
@@ -57,7 +58,7 @@ def main():
         # '20230729.case_study_finalize.D8',
 
         'hf.hitachi-nlp/FLD.v2__default',
-        # 'hf.hitachi-nlp/FLD.v2__star',
+        'hf.hitachi-nlp/FLD.v2__star',
 
         # ---------------------------------- 20230826.jpn ------------------------------------
         # '20230826.jpn.D3',
@@ -77,18 +78,32 @@ def main():
     ]
 
     n_shot_list = [
-        3,
-        # 10,   # for 8k context
+        # 3,
+        10,   # for 8k context
         # 32, # for 16k context
     ]
 
     seeds = [
         0,
-        # 1,
-        # 2,
-        # 3,
-        # 4,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
     ]
+
+    reload_deduction = False   # check reproducibility with ICML-official-release-v2
+    # reload_deduction = True
+
+    wait_until_finish = False
+
+    # ------------------------------------ run ------------------------------------
+    engine = SubprocessEngine()
+    dry_run = False
 
     icl_max_proof_by_contradiction_per_label_args = [
         # 0,
@@ -97,14 +112,6 @@ def main():
         None,
     ]
 
-    wait_until_finish = True
-
-    engine = SubprocessEngine()   # for debug
-    # engine = QsubEngine('ABCI', 'rt_G.large')
-
-    dry_run = False
-
-    # ------------------------------------ run ------------------------------------
     prompt_version = 'v2'
     for dataset_uname in dataset_unames:
         for n_shot in n_shot_list:
@@ -116,7 +123,7 @@ def main():
                         'n_shot': n_shot,
                         'seed': seed,
                         'icl_max_proof_by_contradiction_per_label': icl_max_proof_by_contradiction_per_label,
-                        'reload_deduction': True,
+                        'reload_deduction': reload_deduction,
                     }
                     setting.update(
                         get_dataset_setting(

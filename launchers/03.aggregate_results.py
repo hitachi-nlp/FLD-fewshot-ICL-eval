@@ -65,11 +65,15 @@ def main():
     # ]
     # output_dir = Path('./outputs/03.aggregate_results.py/20231110.FLD_task_old')
 
-    input_dirs = [
-        './outputs/02.evaluate_proofs.py/20231111',
-    ]
-    output_dir = Path('./outputs/03.aggregate_results.py/20231111')
+    # input_dirs = [
+    #     './outputs/02.evaluate_proofs.py/20231111',
+    # ]
+    # output_dir = Path('./outputs/03.aggregate_results.py/20231111')
 
+    input_dirs = [
+        './outputs/02.evaluate_proofs.py/20231111.production',
+    ]
+    output_dir = Path('./outputs/03.aggregate_results.py/20231111.production')
 
     # ------------------------------------ run ------------------------------------
     command = ' '.join([
