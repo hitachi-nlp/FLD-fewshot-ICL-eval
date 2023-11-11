@@ -44,7 +44,7 @@ def main(input_dir, output_dir, log_level):
     ]
 
     def normalize_lab_name(name):
-        return re.sub(r'^dataset\.', '', re.sub(r'^reply\.', '', name))
+        return re.sub(r'^dataset\.', '', re.sub(r'^pred\.', '', name))
 
     df_dict = defaultdict(list)
     for _input_dir in input_dirs:

@@ -53,8 +53,11 @@ def main():
     # input_top_dir = Path('./outputs/01.predict.py/20231110.refactor')
     # output_top_dir = Path('./outputs/02.evaluate_proofs.py/20231110.refactor')
 
-    input_top_dir = Path('./outputs/01.predict.py/20231110.FLD_task_old')
-    output_top_dir = Path('./outputs/02.evaluate_proofs.py/20231110.FLD_task_old')
+    # input_top_dir = Path('./outputs/01.predict.py/20231110.FLD_task_old')
+    # output_top_dir = Path('./outputs/02.evaluate_proofs.py/20231110.FLD_task_old')
+
+    input_top_dir = Path('./outputs/01.predict.py/20231111')
+    output_top_dir = Path('./outputs/02.evaluate_proofs.py/20231111')
 
     skip_if_exists = False
     dry_run = False
@@ -63,15 +66,15 @@ def main():
     engine = SubprocessEngine()
     # engine = QsubEngine('ABCI', 'rt_G.large')
 
-    for reply_path in input_top_dir.glob('**/replies.jsonl'):
+    for pred_path in input_top_dir.glob('**/predictions.jsonl'):
         setting = {
-            'input_path': str(reply_path),
+            'input_path': str(pred_path),
         }
 
-        reply_setting = json.load(open(reply_path.parent / 'lab.params.json'))
+        pred_setting = json.load(open(pred_path.parent / 'lab.params.json'))
         setting.update({
             f'{name}': val
-            for name, val in reply_setting.items()
+            for name, val in pred_setting.items()
         })
 
         output_dir = build_dir(
@@ -87,10 +90,8 @@ def main():
         
         command = ' '.join([
             'python ./scripts/evaluate_proofs.py',
-            str(reply_path),
+            str(pred_path),
             str(output_dir),
-            # '--similarity-threshold' if similarity_threshold else '',
-            # f'--allowed-additional-proof-steps {allowed_additional_proof_steps}',
         ])
 
         if skip_if_exists and (output_dir / 'metrics_summary.json').exists():

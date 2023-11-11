@@ -7,7 +7,7 @@ from script_engine import QsubEngine, SubprocessEngine
 from logger_setup import setup as setup_logger
 from lab import build_dir
 
-from FLD_user_shared_settings import run_by_engine
+from FLD_user_shared_settings import run_by_engine, maybe_option_value
 from settings import DIENAME_IGNORE_PARAMS
 
 logger = logging.getLogger(__name__)
@@ -58,8 +58,14 @@ def main():
     # input_top_dir = Path('./outputs/00.make_dataset.py/20231110.refactor')
     # output_top_dir = Path('./outputs/01.predict.py/20231110.refactor')
 
-    input_top_dir = Path('./outputs/00.make_dataset.py/20231110.FLD_task_old')
-    output_top_dir = Path('./outputs/01.predict.py/20231110.FLD_task_old')
+    # input_top_dir = Path('./outputs/00.make_dataset.py/20231110.FLD_task_old')
+    # output_top_dir = Path('./outputs/01.predict.py/20231110.FLD_task_old')
+
+    # input_top_dir = Path('./outputs/00.make_dataset.py/20231110.FLD_task_old')
+    # output_top_dir = Path('./outputs/01.predict.py/20231110.FLD_task_old')
+
+    input_top_dir = Path('./outputs/00.make_dataset.py/20231111')
+    output_top_dir = Path('./outputs/01.predict.py/20231111')
 
     dataset_unames = [
         # ---------------------------------- 20230729.case_study_finalize ------------------------------------
@@ -88,20 +94,29 @@ def main():
     ]
 
     model_names = [
-        # See [here](https://platform.openai.com/docs/models) for the openai models.
+        # ==== openai models (https://platform.openai.com/docs/models) for the openai models.
+        # ('openai.gpt-3.5-turbo-16k', None),
+        # ('openai.gpt-4', None),                # context=8k, $0.03 / 1K tokens	$0.06 / 1K tokens
 
-        # 'openai.gpt-3.5-turbo',     # context=4k
-        'openai.gpt-3.5-turbo-16k'
-        # 'openai.gpt-3.5-turbo-1106'
+        # ==== llama related models
 
-        # 'openai.gpt-4',               # 	$0.03 / 1K tokens	$0.06 / 1K tokens
-        # 'openai.gpt-4-32k',           # XXX can not access
-        # 'openai.gpt-4-32k-0613',      # XXX can not access
-        # 'openai.gpt-4-1106-preview'   # XXX: somehow less than gpt-4
+        # -- long context Llama models
+        # ('hf.Yukang/Llama-2-7b-longlora-32k-ft', 'hf.meta-llama/Llama-2-7b-hf'),
+        # ('hf.Yukang/Llama-2-13b-longlora-32k-ft', 'hf.meta-llama/Llama-2-7b-hf')
+        # ('hf.Yukang/LongAlpaca-7B', 'hf.meta-llama/Llama-2-7b-hf')
+        ('hf.Yukang/LongAlpaca-13B', 'hf.meta-llama/Llama-2-13b-hf')
 
-        # 'hf.Yukang/Llama-2-70b-longlora-32k',
-        # 'hf.meta-llama/Llama-2-7b-chat-hf',
-        # 'hf.PY007/TinyLlama-1.1B-intermediate-step-480k-1T',
+        # ==== other models not used
+        # ('openai.gpt-3.5-turbo', None),     # XXX context=4k
+        # ('openai.gpt-4-32k', None),            # XXX can not access
+        # ('openai.gpt-4-32k-0613', None),       # XXX can not access
+        # ('openai.gpt-4-1106-preview', None),   # XXX: somehow less than gpt-4
+
+        # -- can not use the following lora models yet, as vLLM does not support them yet. (https://github.com/vllm-project/vllm/issues/1129)
+        # ('hf.Yukang/Llama-2-7b-longlora-32k', 'hf.meta-llama/Llama-2-7b-hf'),
+        # ('hf.Yukang/Llama-2-13b-longlora-32k', 'hf.meta-llama/Llama-2-7b-hf')
+        # ('hf.Yukang/Llama-2-70b-longlora-32k', 'hf.meta-llama/Llama-2-70b-hf'),
+        # ('hf.Yukang/LongAlpaca-70B', 'hf.meta-llama/Llama-2-70b-hf')
     ]
 
     max_samples = 5
@@ -111,19 +126,42 @@ def main():
     # max_samples = 201
     # max_samples = None
 
+    engine = SubprocessEngine()
+    # engine = QsubEngine('ABCI', 'rt_G.small')
+    # engine = QsubEngine('ABCI', 'rt_G.large')
+    # engine = QsubEngine('ABCI', 'rt_AG.small')
+    # engine = QsubEngine('ABCI', 'rt_AF')
+
+    # tensor_parallel_size = 4
+    tensor_parallel_size = 1
+
     skip_if_exists = False
     dry_run = False
 
     # ------------------------------------ run ------------------------------------
-    engine = SubprocessEngine()
-    # engine = QsubEngine('ABCI', 'rt_G.large')
-    prompt_paths = sorted(input_top_dir.glob('**/prompts.jsonl'))
+    if isinstance(engine, QsubEngine):
+        match engine.resource:
+            case 'rt_G.small':
+                tensor_parallel_size = 1
+            case 'rt_G.large':
+                tensor_parallel_size = 4
+            case 'rt_AG.small':
+                tensor_parallel_size = 1
+            case 'rt_AF':
+                tensor_parallel_size = 8
+            case _:
+                raise ValueError(f'unknown resource: {engine.resource}')
+
+
+    prompt_paths = sorted(input_top_dir.glob('**/ICL_dataset.jsonl'))
     for prompt_path in prompt_paths:
-        for model_name in model_names:
+        for model_name, tokenizer_name in model_names:
             setting = {
                 'input_path': str(prompt_path),
                 'model_name': model_name,
                 'max_samples': max_samples,
+                'tensor_parallel_size': tensor_parallel_size,
+                'tokenizer_name': tokenizer_name,
             }
 
             dataset_setting = json.load(open(prompt_path.parent / 'lab.params.json'))
@@ -147,7 +185,6 @@ def main():
                 dirname_ignore_params=DIENAME_IGNORE_PARAMS,
                 save_params=True
             )
-            output_path = output_dir / 'replies.jsonl'
 
             if skip_if_exists and output_path.exists():
                 logger.warning('skip evaluating for the existing results "%s"', str(output_path))
@@ -155,9 +192,12 @@ def main():
                 command = ' '.join([
                     'python ./scripts/predict.py',
                     str(prompt_path),
-                    str(output_path),
-                    f'--model-name {model_name}',
-                    f'--max-examples {max_samples}',
+                    str(output_dir),
+                    f'--model-name {setting["model_name"]}',
+                    maybe_option_value('--tokenizer-name', setting.get('tokenizer_name', None)),
+                    f'--max-examples {setting["max_samples"]}',
+                    f'--tensor-parallel-size {setting["tensor_parallel_size"]}',
+                    '--dtype half',
                 ])
 
             run_by_engine(

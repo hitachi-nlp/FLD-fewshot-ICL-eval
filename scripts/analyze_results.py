@@ -55,7 +55,7 @@ def main(input_path, output_dir, reload_deduction, log_level):
                         facts = example['example'].get('facts', example['example'].get('context', None))
                         hypothesis = example['example']['hypothesis']
                     proof_gold = example['gold_proof']
-                    proof_pred = example['reply']
+                    proof_pred = example['prediction']
 
                     f_out.write('\n\n\n\n\n')
                     f_out.write(f'****************************************** example-{i_example} ******************************************')

@@ -37,7 +37,9 @@ def main():
     # output_top_dir = Path('./outputs/00.make_dataset.py/20231110.refactor')
     # output_top_dir = Path('./outputs/00.make_dataset.py/20231110.refactor')
 
-    output_top_dir = Path('./outputs/00.make_dataset.py/20231110.FLD_task_old')
+    # output_top_dir = Path('./outputs/00.make_dataset.py/20231110.FLD_task_old')
+
+    output_top_dir = Path('./outputs/00.make_dataset.py/20231111')
 
     DATASETS_DIRS = [
         # './outputs/00.fix_FLD_schema.py/20230711.refactor_distractors',

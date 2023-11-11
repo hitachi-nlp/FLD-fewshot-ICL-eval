@@ -40,7 +40,7 @@ def main(input_path,
             example = json.loads(line.strip('\n'))
 
             gold = example['gold_proof']
-            pred = example['reply']
+            pred = example['prediction']
             if pred is None:
                 logger.warning('The example will be skipped because the prediction is None')
                 continue

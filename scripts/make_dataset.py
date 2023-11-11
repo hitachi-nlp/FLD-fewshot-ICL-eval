@@ -17,12 +17,9 @@ from FLD_task import (
     serialize,
 )
 
-# import line_profiling
-
 logger = logging.getLogger(__name__)
 
 
-# @profile
 def load_examples(dataset_name: Optional[str] = None,
                   dataset_config_name: Optional[str] = None,
                   train_file: Optional[str] = None,
@@ -204,8 +201,8 @@ def main(output_dir,
 
     output_dir = Path(output_dir)
     output_dir.mkdir(exist_ok=True)
-    with open(output_dir / 'prompts.jsonl', 'w') as f_jsonl, \
-            open(output_dir / 'prompts.txt', 'w') as f_txt:
+    with open(output_dir / 'ICL_dataset.jsonl', 'w') as f_jsonl, \
+            open(output_dir / 'ICL_dataset.txt', 'w') as f_txt:
         for test_example in text_examples_no_leak:
 
             prompt, gold_proof = make_ICL_texts(prompt_version, ICL_examples, test_example,

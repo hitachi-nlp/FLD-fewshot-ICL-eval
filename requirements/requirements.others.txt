@@ -1,0 +1,2 @@
+pandas
+machine_learning@git+https://github.com/HonoMi/machine-learning.git@main

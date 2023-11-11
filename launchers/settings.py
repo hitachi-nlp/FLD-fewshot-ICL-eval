@@ -10,7 +10,10 @@ DIENAME_IGNORE_PARAMS = [
     'test_file',
     'file_type',
     'prompt_type',
+    'tensor_parallel_size',
     'n_shot',
+    'tokenizer_name',
+    'dtype',
 
     'input_path',
 ]
