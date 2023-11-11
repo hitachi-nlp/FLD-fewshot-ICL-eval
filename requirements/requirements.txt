@@ -5,3 +5,4 @@ vllm
 click
 datasets
 openai
+colorlog

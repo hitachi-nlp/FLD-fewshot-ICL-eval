@@ -8,6 +8,7 @@ The code has been tested on Python 3.11.5
 ```console
 $ pip install -r ./requirements/requirements.txt
 $ git clone https://github.com/hitachi-nlp/FLD-task.git && pip install -e ./FLD-task
+$ export PYTHONPATH=`pwd -P`:$PYTHONPATH
 ```
 
 ## How to evaluate LLMs
@@ -41,14 +42,14 @@ $ git clone https://github.com/hitachi-nlp/FLD-task.git && pip install -e ./FLD-
         --model-name hf.Yukang/Llama-2-13b-longlora-32k-ft \
         --tokenizer-name hf.meta-llama/Llama-2-7b-hf \
         --max-examples 5 \
-        --tensor-parallel-size 4
+        --tensor-parallel-size 1
     ```
 
 1. Compute the metircs:
     ```console
     $ python ./scripts/evaluate_proofs.py \
         outputs/predictions/predictions.jsonl \
-        output/metrics
+        outputs/metrics
     ```
 
 1. Analyze predictions:

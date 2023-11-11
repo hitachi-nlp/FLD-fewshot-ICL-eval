@@ -46,13 +46,14 @@ def main(input_path,
     setup_logger(level=log_level, clear_other_handlers=True)
     input_path = Path(input_path)
     output_dir = Path(output_dir)
+    output_dir.mkdir(exist_ok=True, parents=True)
 
     model_service, _model_name = model_name.split('.', 1)
 
     if model_service == 'openai':
         api_key = api_key or os.environ.get('OPENAI_API_KEY', None)
         if api_key is None:
-            raise ValueError()
+            raise ValueError('API key is not specified.')
 
         chat_model = ChatOpenAI(model_name=_model_name,
                                 openai_api_key=api_key)
@@ -101,7 +102,6 @@ def main(input_path,
     else:
         raise ValueError(f'Unknown model service {model_service}')
 
-    output_dir.mkdir(parents=True, exist_ok=True)
     output_path = output_dir / 'predictions.jsonl'
     with open(output_path, 'w') as f_out:
         for i_example, line in tqdm(enumerate(open(input_path))):
