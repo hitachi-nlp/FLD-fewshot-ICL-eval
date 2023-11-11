@@ -70,10 +70,15 @@ def main():
     # ]
     # output_dir = Path('./outputs/03.aggregate_results.py/20231111')
 
+    # input_dirs = [
+    #     './outputs/02.evaluate_proofs.py/20231111.production',
+    # ]
+    # output_dir = Path('./outputs/03.aggregate_results.py/20231111.production')
+
     input_dirs = [
-        './outputs/02.evaluate_proofs.py/20231111.production',
+        './outputs/02.evaluate_proofs.py/20231111.production.large',
     ]
-    output_dir = Path('./outputs/03.aggregate_results.py/20231111.production')
+    output_dir = Path('./outputs/03.aggregate_results.py/20231111.production.large')
 
     # ------------------------------------ run ------------------------------------
     command = ' '.join([

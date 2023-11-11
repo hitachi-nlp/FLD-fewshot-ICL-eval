@@ -59,12 +59,15 @@ def main():
     # input_top_dir = Path('./outputs/01.predict.py/20231111')
     # output_top_dir = Path('./outputs/02.evaluate_proofs.py/20231111')
 
-    input_top_dir = Path('./outputs/01.predict.py/20231111.production')
-    output_top_dir = Path('./outputs/02.evaluate_proofs.py/20231111.production')
+    # input_top_dir = Path('./outputs/01.predict.py/20231111.production')
+    # output_top_dir = Path('./outputs/02.evaluate_proofs.py/20231111.production')
+
+    input_top_dir = Path('./outputs/01.predict.py/20231111.production.large')
+    output_top_dir = Path('./outputs/02.evaluate_proofs.py/20231111.production.large')
 
     # ------------------------------------ run ------------------------------------
-    engine = SubprocessEngine()
-    # engine = QsubEngine('ABCI', 'rt_G.large')
+    # engine = SubprocessEngine()
+    engine = QsubEngine('ABCI', 'rt_G.small')
 
     skip_if_exists = False
     dry_run = False

@@ -94,16 +94,16 @@ def main():
 
     model_names = [
         # ==== openai models (https://platform.openai.com/docs/models) for the openai models.
-        ('openai.gpt-3.5-turbo-16k', None),
-        ('openai.gpt-4', None),                # context=8k, $0.03 / 1K tokens	$0.06 / 1K tokens
+        # ('openai.gpt-3.5-turbo-16k', None),
+        # ('openai.gpt-4', None),                # context=8k, $0.03 / 1K tokens	$0.06 / 1K tokens
 
         # ==== llama related models
 
         # -- long context Llama models
         # ('hf.Yukang/Llama-2-7b-longlora-32k-ft', 'hf.meta-llama/Llama-2-7b-hf'),
-        # ('hf.Yukang/Llama-2-13b-longlora-32k-ft', 'hf.meta-llama/Llama-2-7b-hf')
-        # ('hf.Yukang/LongAlpaca-7B', 'hf.meta-llama/Llama-2-7b-hf')
-        # ('hf.Yukang/LongAlpaca-13B', 'hf.meta-llama/Llama-2-13b-hf')
+        # ('hf.Yukang/Llama-2-13b-longlora-32k-ft', 'hf.meta-llama/Llama-2-7b-hf'),
+        # ('hf.Yukang/LongAlpaca-7B', 'hf.meta-llama/Llama-2-7b-hf'),
+        ('hf.Yukang/LongAlpaca-13B', 'hf.meta-llama/Llama-2-13b-hf'),   # works on A100(48GB) x 1
 
         # ==== other models not used
         # ('openai.gpt-3.5-turbo', None),     # XXX context=4k
@@ -115,7 +115,7 @@ def main():
         # ('hf.Yukang/Llama-2-7b-longlora-32k', 'hf.meta-llama/Llama-2-7b-hf'),
         # ('hf.Yukang/Llama-2-13b-longlora-32k', 'hf.meta-llama/Llama-2-7b-hf')
         # ('hf.Yukang/Llama-2-70b-longlora-32k', 'hf.meta-llama/Llama-2-70b-hf'),
-        # ('hf.Yukang/LongAlpaca-70B', 'hf.meta-llama/Llama-2-70b-hf')
+        # ('hf.Yukang/LongAlpaca-70B', 'hf.meta-llama/Llama-2-70b-hf'),
     ]
 
     n_shot_list = [
@@ -144,10 +144,10 @@ def main():
     # max_samples = 201
     # max_samples = None
 
-    engine = SubprocessEngine()
+    # engine = SubprocessEngine()
     # engine = QsubEngine('ABCI', 'rt_G.small')
     # engine = QsubEngine('ABCI', 'rt_G.large')
-    # engine = QsubEngine('ABCI', 'rt_AG.small')
+    engine = QsubEngine('ABCI', 'rt_AG.small')
     # engine = QsubEngine('ABCI', 'rt_AF')
 
     # tensor_parallel_size = 4
@@ -227,7 +227,7 @@ def main():
                 engine,
                 command,
                 output_dir,
-                hours=1,
+                hours=3,
                 wait_until_finish=wait_until_finish,
                 dry_run=dry_run
             )

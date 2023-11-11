@@ -47,8 +47,11 @@ def main():
     # input_top_dir = Path('./outputs/02.evaluate_proofs.py/20231111')
     # output_top_dir = Path('./outputs/03.analyze_results.py/20231111')
 
-    input_top_dir = Path('./outputs/02.evaluate_proofs.py/20231111.production')
-    output_top_dir = Path('./outputs/03.analyze_results.py/20231111.production')
+    # input_top_dir = Path('./outputs/02.evaluate_proofs.py/20231111.production')
+    # output_top_dir = Path('./outputs/03.analyze_results.py/20231111.production')
+
+    input_top_dir = Path('./outputs/02.evaluate_proofs.py/20231111.production.large')
+    output_top_dir = Path('./outputs/03.analyze_results.py/20231111.production.large')
 
     # ------------------------------------ run ------------------------------------
     dry_run = False
