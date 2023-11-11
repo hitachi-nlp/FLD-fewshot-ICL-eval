@@ -24,6 +24,7 @@ $ git clone https://github.com/hitachi-nlp/FLD-task.git && pip install -e ./FLD-
     ```
 
 1. Make predictions by LLMs.
+
     For OpanAI model, specify model names as "openai.xx":
     ```console
     $ python ./scripts/predict.py \
