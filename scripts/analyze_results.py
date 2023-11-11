@@ -21,6 +21,7 @@ def main(input_path, output_dir, reload_deduction, log_level):
     setup_logger(level=log_level, clear_other_handlers=True)
     input_path = Path(input_path)
     output_dir = Path(output_dir)
+    output_dir.mkdir(parents=True, exist_ok=True)
 
     examples = [
         json.loads(line.strip('\n'))
@@ -30,8 +31,8 @@ def main(input_path, output_dir, reload_deduction, log_level):
 
     for metric_type in metrics_types:
         for metric in ['proof_accuracy.zero_one', 'answer_accuracy']:
-            errors_path = output_dir / f'metric_type--{metric_type}.metric--{metric}.errors.txt'
-            corrects_path = output_dir / f'metric_type--{metric_type}.metric--{metric}.corrects.txt'
+            errors_path = output_dir / f'metric_type--{metric_type}__metric--{metric}__wrong.txt'
+            corrects_path = output_dir / f'metric_type--{metric_type}__metric--{metric}__correct.txt'
             with open(errors_path, 'w') as f_err, open(corrects_path, 'w') as f_corr:
 
                 for i_example, example in enumerate(examples):

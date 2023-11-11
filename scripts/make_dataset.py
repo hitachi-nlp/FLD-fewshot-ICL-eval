@@ -200,7 +200,7 @@ def main(output_dir,
     text_examples_no_leak = _shuffle(text_examples_no_leak)
 
     output_dir = Path(output_dir)
-    output_dir.mkdir(exist_ok=True)
+    output_dir.mkdir(parents=True, exist_ok=True)
     with open(output_dir / 'ICL_dataset.jsonl', 'w') as f_jsonl, \
             open(output_dir / 'ICL_dataset.txt', 'w') as f_txt:
         for test_example in text_examples_no_leak:

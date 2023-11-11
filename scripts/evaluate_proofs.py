@@ -27,6 +27,7 @@ def main(input_path,
 
     input_path = Path(input_path)
     output_dir = Path(output_dir)
+    output_dir.mkdir(exist_ok=True, parents=True)
 
     calc_metric_funcs = {
         type_: build_metrics(type_)
