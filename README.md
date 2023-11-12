@@ -1,5 +1,5 @@
 # FLD In-Context Learning Evaluation
-This repository includes the code to evaluate large language models on FLD corpora under few-shot in-context learning (Section 5.2 of the paper).  
+This repository includes the code to evaluate various large language models on FLD corpora under few-shot in-context learning (Section 5.2 of the paper).  
 
 See [the entry-point repository](https://github.com/hitachi-nlp/FLD.git) about the whole FLD project.
 
